@@ -43,21 +43,11 @@ namespace OpenSubtitlesHandler.Models.Responses
                 }
 
                 var part = Token.Split('.')[1];
-<<<<<<< HEAD
-                part = part.PadRight(part.Length + (4 - part.Length % 4) % 4, '=');
-                part = Encoding.UTF8.GetString(Convert.FromBase64String(part));
-
-                var sec = JsonSerializer.Deserialize<JWTPayload>(part).exp;
-
-                _expirationDate = DateTimeOffset.FromUnixTimeSeconds(sec).UtcDateTime;
-
-=======
                 part = part.PadRight(part.Length + ((4 - (part.Length % 4)) % 4), '=');
                 part = Encoding.UTF8.GetString(Convert.FromBase64String(part));
 
                 var sec = JsonSerializer.Deserialize<JWTPayload>(part)?.Exp ?? 0;
                 _expirationDate = DateTimeOffset.FromUnixTimeSeconds(sec).UtcDateTime;
->>>>>>> f7d1ca025984caf099b44d9044bb9cac4286fa6f
                 return _expirationDate.Value;
             }
         }

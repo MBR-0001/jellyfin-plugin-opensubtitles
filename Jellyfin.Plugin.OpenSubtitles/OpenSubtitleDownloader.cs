@@ -227,35 +227,6 @@ namespace Jellyfin.Plugin.OpenSubtitles
                 throw new AuthenticationException("Unable to login");
             }
 
-            if (string.IsNullOrWhiteSpace(_apiKey))
-            {
-                throw new AuthenticationException("API key not set up");
-            }
-
-            if (_login?.User?.RemainingDownloads <= 0)
-            {
-                if (_limitReset < DateTime.UtcNow)
-                {
-                    _logger.LogDebug("Reset time passed, updating user info");
-
-                    await UpdateUserInfo(cancellationToken).ConfigureAwait(false);
-
-                    // this shouldn't happen?
-                    if (_login.User.RemainingDownloads <= 0)
-                    {
-                        _logger.LogError("OpenSubtitles download limit reached");
-                        throw new RateLimitExceededException("OpenSubtitles download limit reached");
-                    }
-                }
-                else
-                {
-                    _logger.LogError("OpenSubtitles download limit reached");
-                    throw new RateLimitExceededException("OpenSubtitles download limit reached");
-                }
-            }
-
-            await Login(cancellationToken).ConfigureAwait(false);
-
             var idParts = id.Split('-', 3);
             var format = idParts[0];
             var language = idParts[1];

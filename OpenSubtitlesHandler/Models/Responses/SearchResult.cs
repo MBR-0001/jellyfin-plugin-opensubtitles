@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-﻿using System.Collections.Generic;
-=======
-﻿using System;
+using System;
 using System.Collections.Generic;
->>>>>>> f7d1ca025984caf099b44d9044bb9cac4286fa6f
 using System.Text.Json.Serialization;
 
 namespace OpenSubtitlesHandler.Models.Responses
