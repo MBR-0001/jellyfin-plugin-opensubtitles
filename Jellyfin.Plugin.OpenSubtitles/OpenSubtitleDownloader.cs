@@ -30,6 +30,7 @@ namespace Jellyfin.Plugin.OpenSubtitles
         private readonly ILogger<OpenSubtitleDownloader> _logger;
         private LoginInfo? _login;
         private DateTime? _limitReset;
+        private DateTime? _lastRatelimitLog;
         private IReadOnlyList<string>? _languages;
         private string _apiKey;
 
@@ -79,6 +80,17 @@ namespace Jellyfin.Plugin.OpenSubtitles
             if (string.IsNullOrWhiteSpace(_apiKey))
             {
                 throw new AuthenticationException("API key not set up");
+            }
+
+            if (request.IsAutomated && _login?.User?.RemainingDownloads <= 0)
+            {
+                if (_lastRatelimitLog == null || DateTime.UtcNow.Subtract(_lastRatelimitLog.Value).TotalSeconds > 60)
+                {
+                    _logger.LogInformation("Download limit reached, returning no results for automated task");
+                    _lastRatelimitLog = DateTime.UtcNow;
+                }
+
+                return Enumerable.Empty<RemoteSubtitleInfo>();
             }
 
             long.TryParse(request.GetProviderId(MetadataProvider.Imdb)?.TrimStart('t') ?? string.Empty, NumberStyles.Any, _usCulture, out var imdbId);
