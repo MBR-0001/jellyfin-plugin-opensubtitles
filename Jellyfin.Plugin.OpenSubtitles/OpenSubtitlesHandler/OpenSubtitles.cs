@@ -151,7 +151,7 @@ public static class OpenSubtitles
 
             last = new ApiResponse<SearchResult>(response, $"url: {url}", $"page: {current}");
 
-            if (!last.Ok || last.Data == null)
+            if (!last.Ok || last.Data is null)
             {
                 break;
             }
