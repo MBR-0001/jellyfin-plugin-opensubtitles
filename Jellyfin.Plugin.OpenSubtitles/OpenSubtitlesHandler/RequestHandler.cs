@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -16,7 +17,7 @@ namespace Jellyfin.Plugin.OpenSubtitles.OpenSubtitlesHandler;
 /// </summary>
 public static class RequestHandler
 {
-    private const string BaseApiUrl = "https://api.opensubtitles.com/api/v1";
+    private static string baseApiUrl;
 
     // header rate limits (5/1s & 240/1 min)
     private static int _hRemaining = -1;
@@ -24,6 +25,21 @@ public static class RequestHandler
     // 40/10s limits
     private static DateTime _windowStart = DateTime.MinValue;
     private static int _requestCount;
+
+    static RequestHandler()
+    {
+        SetBaseUrl("api.opensubtitles.com");
+    }
+
+    /// <summary>
+    /// Set the new base url.
+    /// </summary>
+    /// <param name="newUrl">The new base url.</param>
+    [MemberNotNull(nameof(baseApiUrl))]
+    public static void SetBaseUrl(string newUrl)
+    {
+        baseApiUrl = $"https://{newUrl}/api/v1";
+    }
 
     /// <summary>
     /// Send the request.
@@ -82,7 +98,9 @@ public static class RequestHandler
             _requestCount = 0;
         }
 
-        var response = await OpenSubtitlesRequestHelper.Instance!.SendRequestAsync(BaseApiUrl + endpoint, method, body, headers, cancellationToken).ConfigureAwait(false);
+        var response = await OpenSubtitlesRequestHelper.Instance!
+            .SendRequestAsync(baseApiUrl + endpoint, method, body, headers, cancellationToken)
+            .ConfigureAwait(false);
 
         _requestCount++;
 

@@ -25,6 +25,12 @@ public class LoginInfo
     public string? Token { get; set; }
 
     /// <summary>
+    /// Gets or sets the base api url.
+    /// </summary>
+    [JsonPropertyName("base_url")]
+    public string? BaseUrl { get; set; }
+
+    /// <summary>
     /// Gets the expiration date.
     /// </summary>
     [JsonIgnore]

@@ -352,6 +352,12 @@ public class OpenSubtitleDownloader : ISubtitleProvider
 
         _login = loginResponse.Data;
 
+        if (_login?.BaseUrl is not null)
+        {
+            _logger.LogInformation("Setting API base url to {BaseUrl}", _login.BaseUrl);
+            RequestHandler.SetBaseUrl(_login.BaseUrl);
+        }
+
         await UpdateUserInfo(cancellationToken).ConfigureAwait(false);
 
         _logger.LogDebug("Logged in, download limit reset at {ResetTime}, token expiration at {ExpirationDate}", _limitReset, _login?.ExpirationDate);
