@@ -175,7 +175,8 @@ public class OpenSubtitleDownloader : ISubtitleProvider
             && request.ContentType == VideoContentType.Episode
                 ? x.Attributes.FeatureDetails.SeasonNumber == request.ParentIndexNumber
                     && x.Attributes.FeatureDetails.EpisodeNumber == request.IndexNumber
-                : x.Attributes?.FeatureDetails?.ImdbId == imdbId;
+                : x.Attributes?.FeatureDetails?.ImdbId == imdbId
+            && x.Attributes?.Files?.Count > 0;
 
         if (searchResponse.Data is null)
         {
@@ -201,8 +202,7 @@ public class OpenSubtitleDownloader : ISubtitleProvider
                 Name = i.Attributes?.Release,
                 DateCreated = i.Attributes?.UploadDate,
                 IsHashMatch = i.Attributes?.MovieHashMatch
-            })
-            .Where(i => !string.Equals(i.Format, "sub", StringComparison.OrdinalIgnoreCase) && !string.Equals(i.Format, "idx", StringComparison.OrdinalIgnoreCase));
+            });
     }
 
     private async Task<SubtitleResponse> GetSubtitlesInternal(string id, CancellationToken cancellationToken)
