@@ -240,14 +240,19 @@ public class OpenSubtitleDownloader : ISubtitleProvider
             throw new AuthenticationException("Unable to login");
         }
 
-        var idParts = id.Split('-', 3);
+        var idParts = id.Split('-');
+        if (idParts.Length != 3)
+        {
+            throw new FormatException(string.Format(CultureInfo.InvariantCulture, "Invalid subtitle id format: {0}", id));
+        }
+
         var format = idParts[0];
         var language = idParts[1];
-        var ossId = idParts[2];
+        var fileId = int.Parse(idParts[2], CultureInfo.InvariantCulture);
 
-        var fid = int.Parse(ossId, CultureInfo.InvariantCulture);
-
-        var info = await OpenSubtitlesHandler.OpenSubtitles.GetSubtitleLinkAsync(fid, _login, ApiKey, cancellationToken).ConfigureAwait(false);
+        var info = await OpenSubtitlesHandler.OpenSubtitles
+            .GetSubtitleLinkAsync(fileId, format, _login, ApiKey, cancellationToken)
+            .ConfigureAwait(false);
 
         if (info.Data?.ResetTime is not null)
         {
@@ -281,7 +286,7 @@ public class OpenSubtitleDownloader : ISubtitleProvider
             msg = string.Format(
                 CultureInfo.InvariantCulture,
                 "Invalid response for file {0}: {1}\n\n{2}",
-                fid,
+                fileId,
                 info.Code,
                 msg);
 
@@ -299,7 +304,7 @@ public class OpenSubtitleDownloader : ISubtitleProvider
             var msg = string.Format(
                 CultureInfo.InvariantCulture,
                 "Failed to obtain download link for file {0}: {1} (empty response)",
-                fid,
+                fileId,
                 info.Code);
 
             throw new HttpRequestException(msg);
@@ -312,7 +317,7 @@ public class OpenSubtitleDownloader : ISubtitleProvider
             var msg = string.Format(
                 CultureInfo.InvariantCulture,
                 "Subtitle with Id {0} could not be downloaded: {1}",
-                ossId,
+                fileId,
                 res.Code);
 
             throw new HttpRequestException(msg);

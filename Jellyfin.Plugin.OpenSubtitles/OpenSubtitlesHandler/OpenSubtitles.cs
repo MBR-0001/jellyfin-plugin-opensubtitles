@@ -76,11 +76,17 @@ public static class OpenSubtitles
     /// Get the subtitle link.
     /// </summary>
     /// <param name="file">The subtitle file.</param>
+    /// <param name="format">The subtitle format.</param>
     /// <param name="user">The user information.</param>
     /// <param name="apiKey">The api key.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The subtitle download info.</returns>
-    public static async Task<ApiResponse<SubtitleDownloadInfo>> GetSubtitleLinkAsync(int file, LoginInfo user, string apiKey, CancellationToken cancellationToken)
+    public static async Task<ApiResponse<SubtitleDownloadInfo>> GetSubtitleLinkAsync(
+        int file,
+        string format,
+        LoginInfo user,
+        string apiKey,
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(user.Token))
         {
@@ -89,7 +95,7 @@ public static class OpenSubtitles
 
         var headers = new Dictionary<string, string> { { "Authorization", user.Token } };
 
-        var body = new { file_id = file };
+        var body = new { file_id = file, sub_format = format };
         var response = await RequestHandler.SendRequestAsync("/download", HttpMethod.Post, body, headers, apiKey, 1, cancellationToken).ConfigureAwait(false);
 
         return new ApiResponse<SubtitleDownloadInfo>(response, $"file id: {file}");
